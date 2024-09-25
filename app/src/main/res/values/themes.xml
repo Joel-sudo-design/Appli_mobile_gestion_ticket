@@ -1,0 +1,29 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Appli_mobile" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorOnSurface">@color/white</item>
+        <item name="colorPrimary">@color/focus</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">@color/focus</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
+    </style>
+    <style name="roundedImageView" parent="Base.Theme.Appli_mobile">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+    <style name="ThemeOverlay.AppTheme.TextInputEditText.Outlined" parent="">
+        <item name="colorControlActivated">@color/white</item>
+    </style>
+    <style name="Theme.Appli_mobile" parent="Base.Theme.Appli_mobile">
+        <item name="android:textColor">@color/niit</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="Theme.Appli_mobile.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="colorControlActivated">@color/white</item>
+    </style>
+    <style name="Theme.Appli_mobile.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
+
+    </style>
+</resources>

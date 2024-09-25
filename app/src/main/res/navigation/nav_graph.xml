@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/fragment_tickets_en_attente">
+
+    <fragment
+        android:id="@+id/fragment_tickets_en_attente"
+        android:name="com.example.appli_mobile.fragment_tickets_en_attente"
+        android:label="@string/tickets_en_attente"
+        tools:layout="@layout/fragment_tickets_en_attente" />
+
+    <fragment
+        android:id="@+id/fragment_tickets_en_cours"
+        android:name="com.example.appli_mobile.fragment_tickets_en_cours"
+        android:label="@string/tickets_en_cours"
+        tools:layout="@layout/fragment_tickets_en_cours" />
+
+    <fragment
+        android:id="@+id/fragment_tickets_resolus"
+        android:name="com.example.appli_mobile.fragment_tickets_resolus"
+        android:label="@string/tickets_resolus"
+        tools:layout="@layout/fragment_tickets_resolus" />
+
+</navigation>
