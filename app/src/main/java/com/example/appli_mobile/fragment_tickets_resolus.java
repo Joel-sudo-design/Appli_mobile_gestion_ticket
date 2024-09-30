@@ -71,7 +71,7 @@ public class fragment_tickets_resolus extends Fragment {
             logger.severe(e.getMessage());
         }
 
-        String login_url = "http://http://192.168.10.34/resolved_ticket_android";
+        String login_url = "https://151.80.59.103/resolved_ticket_android";
         JsonObjectRequest jsArrayRequest = new JsonObjectRequest
                 (Request.Method.POST, login_url, request, response -> {
                     try {
@@ -122,7 +122,7 @@ public class fragment_tickets_resolus extends Fragment {
             logger.severe(e.getMessage());
         }
 
-        String login_url = "http://192.168.10.34/resolved_ticket_android";
+        String login_url = "https://151.80.59.103/resolved_ticket_android";
         JsonObjectRequest jsArrayRequest = new JsonObjectRequest
                 (Request.Method.POST, login_url, request, response -> {
                     try {
