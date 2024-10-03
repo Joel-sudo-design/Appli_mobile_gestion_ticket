@@ -75,7 +75,7 @@ public class fragment_tickets_en_attente extends Fragment {
             logger.severe(e.getMessage());
         }
 
-        String login_url = "https://151.80.59.103/waiting_ticket_android";
+        String login_url = "https://support.joeldermont.fr/waiting_ticket_android";
         JsonObjectRequest jsArrayRequest = new JsonObjectRequest
                 (Request.Method.POST, login_url, request, response -> {
                     try {
@@ -125,7 +125,7 @@ public class fragment_tickets_en_attente extends Fragment {
             logger.severe(e.getMessage());
         }
 
-        String login_url = "https://151.80.59.103/waiting_ticket_android";
+        String login_url = "https://support.joeldermont.fr/waiting_ticket_android";
         JsonObjectRequest jsArrayRequest = new JsonObjectRequest
                 (Request.Method.POST, login_url, request, response -> {
                     try {

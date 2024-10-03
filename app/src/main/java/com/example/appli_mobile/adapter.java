@@ -23,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -61,7 +62,7 @@ public class adapter extends RecyclerView.Adapter<adapter.ViewHolder> implements
 
     public adapter(ArrayList<model> tickets) {
         this.tickets = tickets;
-        this.ticketsFiltered = new ArrayList<>(tickets);
+        ticketsFiltered = new ArrayList<>(tickets);
     }
 
     @Override
@@ -75,16 +76,19 @@ public class adapter extends RecyclerView.Adapter<adapter.ViewHolder> implements
                 } else {
                     String filterPattern = constraint.toString().toLowerCase().trim();
                     for (model item : ticketsFiltered) {
-                        if (item.getDescription().toLowerCase().contains(filterPattern)) {
-                            filterResults.add(item);
-                        }
-                        if (item.getTitle().toLowerCase().contains(filterPattern)) {
+                        if (item.getTicketNumber().toLowerCase().contains(filterPattern)) {
                             filterResults.add(item);
                         }
                         if (item.getCategory().toLowerCase().contains(filterPattern)) {
                             filterResults.add(item);
                         }
-                        if (item.getTicketNumber().toLowerCase().contains(filterPattern)) {
+                        if (item.getTitle().toLowerCase().contains(filterPattern)) {
+                            filterResults.add(item);
+                        }
+                        if (item.getDescription().toLowerCase().contains(filterPattern)) {
+                            filterResults.add(item);
+                        }
+                        if (item.getAnswer().toLowerCase().contains(filterPattern)) {
                             filterResults.add(item);
                         }
                     }
@@ -94,11 +98,10 @@ public class adapter extends RecyclerView.Adapter<adapter.ViewHolder> implements
                 return results;
             }
 
-            @SuppressLint("NotifyDataSetChanged")
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
                 tickets.clear();
-                tickets.addAll((ArrayList<model>) results.values);
+                tickets.addAll((Collection<? extends model>) results.values);
                 notifyDataSetChanged();
             }
         };
@@ -164,7 +167,7 @@ public class adapter extends RecyclerView.Adapter<adapter.ViewHolder> implements
             logger.severe(e.getMessage());
         }
 
-        String login_url = "https://151.80.59.103/open_ticket_android";
+        String login_url = "https://support.joeldermont.fr/open_ticket_android";
         JsonObjectRequest jsArrayRequest = new JsonObjectRequest
                 (Request.Method.POST, login_url, request, response -> {
                     try {

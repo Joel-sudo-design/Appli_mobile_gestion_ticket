@@ -35,14 +35,14 @@ public class activity_login extends AppCompatActivity {
         binding.indeterminateBar.setVisibility(View.INVISIBLE);
         binding.btnForgotPassword.setOnClickListener(v -> {
             binding.btnForgotPassword.setTextColor(Color.parseColor("#a8efff"));
-            String url = "https://151.80.59.103/reset-password";
+            String url = "https://support.joeldermont.fr/reset-password";
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(url));
             startActivity(i);
         });
         binding.btnLoginRegister.setOnClickListener(v -> {
             binding.btnLoginRegister.setTextColor(Color.parseColor("#a8efff"));
-            String url = "https://151.80.59.103/register";
+            String url = "https://support.joeldermont.fr/register";
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(url));
             startActivity(i);
@@ -76,7 +76,7 @@ public class activity_login extends AppCompatActivity {
             logger.severe(e.getMessage());
         }
 
-        String login_url = "https://151.80.59.103/LoginAndroid";
+        String login_url = "https://support.joeldermont.fr/LoginAndroid";
         JsonObjectRequest jsArrayRequest = new JsonObjectRequest
                 (Request.Method.POST, login_url, request, response -> {
                     try {

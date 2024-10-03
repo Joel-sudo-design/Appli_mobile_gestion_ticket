@@ -45,9 +45,10 @@
                 app:endIconTint="@color/niit"
                 android:paddingTop="0dp"
                 android:paddingBottom="0dp"
-                app:boxStrokeColor="@color/stroke_filter"
                 app:hintTextColor="@color/niit"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu" >
+                app:boxStrokeWidth="0dp"
+                app:boxStrokeWidthFocused="0dp"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu" >
                 <AutoCompleteTextView
                     android:id="@+id/autoCompleteText"
                     android:layout_width="wrap_content"
@@ -57,7 +58,7 @@
                     android:paddingBottom="0dp"
                     android:textColor="@color/niit"
                     android:inputType="none"
-                    android:icon = "@drawable/filter"/>
+                    android:icon = "@drawable/filter" />
             </com.google.android.material.textfield.TextInputLayout>
 
         </RelativeLayout>
