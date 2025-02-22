@@ -2,6 +2,7 @@ package com.example.appli_mobile;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -123,7 +124,7 @@ public class adapter extends RecyclerView.Adapter<adapter.ViewHolder> implements
         viewholder.category.setText(model.getCategory());
         viewholder.title.setText(model.getTitle());
         viewholder.description.setText(model.getDescription());
-        viewholder.answer.setText(model.getAnswer());
+        viewholder.answer.setText(Html.fromHtml(model.getAnswer()));
         viewholder.date.setText(model.getDate());
 
         boolean isExpanded = position == expandedPosition == !com.example.appli_mobile.model.isExpanded();

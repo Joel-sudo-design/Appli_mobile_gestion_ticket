@@ -71,20 +71,22 @@ public class fragment_tickets_resolus extends Fragment {
         final Logger logger = Logger.getLogger(fragment_tickets_resolus.class.getName());
         try {
             request.put(KEY_USERNAME, username);
-
         } catch (JSONException e) {
             logger.severe(e.getMessage());
         }
 
         String login_url = "https://support.joeldermont.fr/resolved_ticket_android";
-        JsonObjectRequest jsArrayRequest = new JsonObjectRequest
-                (Request.Method.POST, login_url, request, response -> {
+        JsonObjectRequest jsArrayRequest = new JsonObjectRequest(
+                Request.Method.POST,
+                login_url,
+                request,
+                response -> {
                     try {
-
                         if (response.getInt(KEY_STATUS) == 1) {
                             tickets = new ArrayList<>();
-                            for (int i = 0; i < response.getJSONArray("resolvedTickets").length(); i++) {
-                                JSONObject ticketObj = response.getJSONArray("resolvedTickets").getJSONObject(i);
+                            JSONArray resolvedTickets = response.getJSONArray("resolvedTickets");
+                            for (int i = 0; i < resolvedTickets.length(); i++) {
+                                JSONObject ticketObj = resolvedTickets.getJSONObject(i);
                                 String id = ticketObj.getString("id");
                                 String category = ticketObj.getString("category");
                                 String simplePriority = ticketObj.getString("priority");
@@ -94,41 +96,47 @@ public class fragment_tickets_resolus extends Fragment {
                                 String date = ticketObj.getString("date");
                                 boolean isopen = ticketObj.getBoolean("open");
 
-                                // Traitement du tableau "answers"
-                                JSONArray answersArray = ticketObj.getJSONArray("answers");
-                                String adminAnswer = "";
-                                String userAnswer = "";
-                                for (int j = 0; j < answersArray.length(); j++) {
-                                    JSONObject answerObj = answersArray.getJSONObject(j);
-                                    if (answerObj.has("admin")) {
-                                        adminAnswer = answerObj.getString("admin");
-                                    }
-                                    if (answerObj.has("user")) {
-                                        userAnswer = answerObj.getString("user");
+                                // Traitement du tableau "answers" avec format HTML
+                                String answer = "";
+                                if (ticketObj.has("answers")) {
+                                    JSONArray answersArray = ticketObj.getJSONArray("answers");
+                                    if (answersArray.length() > 0) {
+                                        StringBuilder answerBuilder = new StringBuilder();
+                                        for (int j = 0; j < answersArray.length(); j++) {
+                                            JSONObject answerObj = answersArray.getJSONObject(j);
+                                            if (answerObj.has("admin") && !answerObj.getString("admin").isEmpty()) {
+                                                answerBuilder.append("<b>Admin:</b> ")
+                                                        .append(answerObj.getString("admin"))
+                                                        .append("<br/><br/>");
+                                            }
+                                            if (answerObj.has("user") && !answerObj.getString("user").isEmpty()) {
+                                                answerBuilder.append("<b>User:</b> ")
+                                                        .append(answerObj.getString("user"))
+                                                        .append("<br/><br/>");
+                                            }
+                                        }
+                                        answer = answerBuilder.toString().trim();
                                     }
                                 }
-                                String answer = "Admin: " + adminAnswer + "\nUser: " + userAnswer;
 
-                                // Création de l'objet modèle avec les réponses concaténées
-                                model model = new model(id, category, priority, title, description, answer, date, isopen);
-                                tickets.add(model);
-                                binding.indeterminateBar.setVisibility(View.INVISIBLE);
+                                // Création de l'objet modèle avec la chaîne answer formatée (ou vide)
+                                model modelObj = new model(id, category, priority, title, description, answer, date, isopen);
+                                tickets.add(modelObj);
                             }
+                            binding.indeterminateBar.setVisibility(View.INVISIBLE);
                             adapter = new adapter(tickets);
                             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                             recyclerView.setAdapter(adapter);
-                        }
-
-                        else if (response.getInt(KEY_STATUS) == 0) {
+                        } else if (response.getInt(KEY_STATUS) == 0) {
                             Toast.makeText(requireActivity().getApplicationContext(),
                                     response.getString(KEY_MESSAGE), Toast.LENGTH_SHORT).show();
                             binding.indeterminateBar.setVisibility(View.INVISIBLE);
                         }
-
                     } catch (JSONException e) {
                         logger.severe(e.getMessage());
                     }
-                }, error -> Toast.makeText(requireActivity().getApplicationContext(),
+                },
+                error -> Toast.makeText(requireActivity().getApplicationContext(),
                         error.getMessage(), Toast.LENGTH_SHORT).show());
 
         MySingleton.getInstance(this.requireActivity().getApplicationContext()).addToRequestQueue(jsArrayRequest);
