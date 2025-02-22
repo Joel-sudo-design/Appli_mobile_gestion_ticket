@@ -82,51 +82,58 @@ public class activity_main extends AppCompatActivity {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             Bundle bundle = new Bundle();
             bundle.putString("username", username);
+
             if (item.getItemId() == R.id.nav_tickets_en_attente) {
                 ticket.setText(R.string.tickets_en_attente_main);
-                fragmentTicketsEnAttente.setArguments(bundle);
-                transaction.replace(R.id.frame_layout, fragmentTicketsEnAttente).commit();
+                // Créer une nouvelle instance du fragment "Tickets en attente"
+                fragment_tickets_en_attente newFragment = new fragment_tickets_en_attente();
+                newFragment.setArguments(bundle);
+                transaction.replace(R.id.frame_layout, newFragment).commit();
                 drawer.closeDrawers();
                 autoCompleteText.setText("");
-                autoCompleteText.setOnItemClickListener((parent, view, position, id) -> {
+                autoCompleteText.setOnItemClickListener((parent, view, position, id1) -> {
                     String itemFilter = parent.getItemAtPosition(position).toString();
-                    if (fragmentTicketsEnAttente.adapter != null) {
-                            if (itemFilter.equals("Plus récent")) {
-                                fragmentTicketsEnAttente.recentTickets();
-                            } else if (itemFilter.equals("Plus ancien")) {
-                                fragmentTicketsEnAttente.oldTickets();
-                            }
+                    if (newFragment.adapter != null) {
+                        if (itemFilter.equals("Plus récent")) {
+                            newFragment.recentTickets();
+                        } else if (itemFilter.equals("Plus ancien")) {
+                            newFragment.oldTickets();
                         }
-                    });
+                    }
+                });
             } else if (item.getItemId() == R.id.nav_tickets_en_cours) {
                 ticket.setText(R.string.tickets_en_cours_main);
-                fragmentTicketsEnCours.setArguments(bundle);
-                transaction.replace(R.id.frame_layout, fragmentTicketsEnCours).commit();
+                // Créer une nouvelle instance du fragment "Tickets en cours"
+                fragment_tickets_en_cours newFragment = new fragment_tickets_en_cours();
+                newFragment.setArguments(bundle);
+                transaction.replace(R.id.frame_layout, newFragment).commit();
                 drawer.closeDrawers();
                 autoCompleteText.setText("");
-                autoCompleteText.setOnItemClickListener((parent, view, position, id) -> {
+                autoCompleteText.setOnItemClickListener((parent, view, position, id1) -> {
                     String itemFilter = parent.getItemAtPosition(position).toString();
-                    if (fragmentTicketsEnCours.adapter != null) {
+                    if (newFragment.adapter != null) {
                         if (itemFilter.equals("Plus récent")) {
-                            fragmentTicketsEnCours.recentTickets();
+                            newFragment.recentTickets();
                         } else if (itemFilter.equals("Plus ancien")) {
-                            fragmentTicketsEnCours.oldTickets();
+                            newFragment.oldTickets();
                         }
                     }
                 });
             } else if (item.getItemId() == R.id.nav_tickets_resolus) {
                 ticket.setText(R.string.tickets_r_solus_main);
-                fragmentTicketsResolus.setArguments(bundle);
-                transaction.replace(R.id.frame_layout, fragmentTicketsResolus).commit();
+                // Créer une nouvelle instance du fragment "Tickets résolus"
+                fragment_tickets_resolus newFragment = new fragment_tickets_resolus();
+                newFragment.setArguments(bundle);
+                transaction.replace(R.id.frame_layout, newFragment).commit();
                 drawer.closeDrawers();
                 autoCompleteText.setText("");
-                autoCompleteText.setOnItemClickListener((parent, view, position, id) -> {
+                autoCompleteText.setOnItemClickListener((parent, view, position, id1) -> {
                     String itemFilter = parent.getItemAtPosition(position).toString();
-                    if (fragmentTicketsResolus.adapter != null) {
+                    if (newFragment.adapter != null) {
                         if (itemFilter.equals("Plus récent")) {
-                            fragmentTicketsResolus.recentTickets();
+                            newFragment.recentTickets();
                         } else if (itemFilter.equals("Plus ancien")) {
-                            fragmentTicketsResolus.oldTickets();
+                            newFragment.oldTickets();
                         }
                     }
                 });
@@ -138,6 +145,7 @@ public class activity_main extends AppCompatActivity {
 
             return true;
         });
+
     }
 
     @Override

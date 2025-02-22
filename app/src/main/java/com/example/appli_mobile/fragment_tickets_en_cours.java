@@ -14,6 +14,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.appli_mobile.databinding.FragmentTicketsEnCoursBinding;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
@@ -46,7 +48,16 @@ public class fragment_tickets_en_cours extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                getTicketsNoBar(username);
+                // Créer une nouvelle instance du fragment et lui passer le même argument
+                fragment_tickets_en_cours newFragment = new fragment_tickets_en_cours();
+                Bundle newBundle = new Bundle();
+                newBundle.putString("username", username);
+                newFragment.setArguments(newBundle);
+
+                // Remplacer le fragment actuel par la nouvelle instance
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.frame_layout, newFragment)
+                        .commit();
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
@@ -75,16 +86,33 @@ public class fragment_tickets_en_cours extends Fragment {
                         if (response.getInt(KEY_STATUS) == 1) {
                             tickets = new ArrayList<>();
                             for (int i = 0; i < response.getJSONArray("inProgressTickets").length(); i++) {
-                                String id = response.getJSONArray("inProgressTickets").getJSONObject(i).getString("id");
-                                String category = response.getJSONArray("inProgressTickets").getJSONObject(i).getString("category");
-                                String simplePriority = response.getJSONArray("inProgressTickets").getJSONObject(i).getString("priority");
-                                String priority = "priorité" + " " + simplePriority.toLowerCase();
-                                String title = response.getJSONArray("inProgressTickets").getJSONObject(i).getString("title");
-                                String description = response.getJSONArray("inProgressTickets").getJSONObject(i).getString("description");
-                                String answer = response.getJSONArray("inProgressTickets").getJSONObject(i).getString("answer");
-                                String date = response.getJSONArray("inProgressTickets").getJSONObject(i).getString("date");
-                                Boolean isopen = response.getJSONArray("inProgressTickets").getJSONObject(i).getBoolean("open");
-                                model model = new model(id,category, priority, title, description, answer, date, isopen);
+                                JSONObject ticketObj = response.getJSONArray("inProgressTickets").getJSONObject(i);
+                                String id = ticketObj.getString("id");
+                                String category = ticketObj.getString("category");
+                                String simplePriority = ticketObj.getString("priority");
+                                String priority = "priorité " + simplePriority.toLowerCase();
+                                String title = ticketObj.getString("title");
+                                String description = ticketObj.getString("description");
+                                String date = ticketObj.getString("date");
+                                boolean isopen = ticketObj.getBoolean("open");
+
+                                // Traitement du tableau "answers"
+                                JSONArray answersArray = ticketObj.getJSONArray("answers");
+                                String adminAnswer = "";
+                                String userAnswer = "";
+                                for (int j = 0; j < answersArray.length(); j++) {
+                                    JSONObject answerObj = answersArray.getJSONObject(j);
+                                    if (answerObj.has("admin")) {
+                                        adminAnswer = answerObj.getString("admin");
+                                    }
+                                    if (answerObj.has("user")) {
+                                        userAnswer = answerObj.getString("user");
+                                    }
+                                }
+                                String answer = "Admin: " + adminAnswer + "\nUser: " + userAnswer;
+
+                                // Création de l'objet modèle avec les réponses concaténées
+                                model model = new model(id, category, priority, title, description, answer, date, isopen);
                                 tickets.add(model);
                             }
                             adapter = new adapter(tickets);
@@ -126,22 +154,39 @@ public class fragment_tickets_en_cours extends Fragment {
                         if (response.getInt(KEY_STATUS) == 1) {
                             tickets = new ArrayList<>();
                             for (int i = 0; i < response.getJSONArray("inProgressTickets").length(); i++) {
-                                String id = response.getJSONArray("inProgressTickets").getJSONObject(i).getString("id");
-                                String category = response.getJSONArray("inProgressTickets").getJSONObject(i).getString("category");
-                                String simplePriority = response.getJSONArray("inProgressTickets").getJSONObject(i).getString("priority");
-                                String priority = "priorité" + " " + simplePriority.toLowerCase();
-                                String title = response.getJSONArray("inProgressTickets").getJSONObject(i).getString("title");
-                                String description = response.getJSONArray("inProgressTickets").getJSONObject(i).getString("description");
-                                String answer = response.getJSONArray("inProgressTickets").getJSONObject(i).getString("answer");
-                                String date = response.getJSONArray("inProgressTickets").getJSONObject(i).getString("date");
-                                Boolean isopen = response.getJSONArray("inProgressTickets").getJSONObject(i).getBoolean("open");
-                                model model = new model(id,category, priority, title, description, answer, date, isopen);
+                                JSONObject ticketObj = response.getJSONArray("inProgressTickets").getJSONObject(i);
+                                String id = ticketObj.getString("id");
+                                String category = ticketObj.getString("category");
+                                String simplePriority = ticketObj.getString("priority");
+                                String priority = "priorité " + simplePriority.toLowerCase();
+                                String title = ticketObj.getString("title");
+                                String description = ticketObj.getString("description");
+                                String date = ticketObj.getString("date");
+                                boolean isopen = ticketObj.getBoolean("open");
+
+                                // Traitement du tableau "answers"
+                                JSONArray answersArray = ticketObj.getJSONArray("answers");
+                                String adminAnswer = "";
+                                String userAnswer = "";
+                                for (int j = 0; j < answersArray.length(); j++) {
+                                    JSONObject answerObj = answersArray.getJSONObject(j);
+                                    if (answerObj.has("admin")) {
+                                        adminAnswer = answerObj.getString("admin");
+                                    }
+                                    if (answerObj.has("user")) {
+                                        userAnswer = answerObj.getString("user");
+                                    }
+                                }
+                                String answer = "Admin: " + adminAnswer + "\nUser: " + userAnswer;
+
+                                // Création de l'objet modèle avec les réponses concaténées
+                                model model = new model(id, category, priority, title, description, answer, date, isopen);
                                 tickets.add(model);
+                                binding.indeterminateBar.setVisibility(View.INVISIBLE);
                             }
                             adapter = new adapter(tickets);
                             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                             recyclerView.setAdapter(adapter);
-                            binding.indeterminateBar.setVisibility(View.INVISIBLE);
                         }
 
                         else if (response.getInt(KEY_STATUS) == 0) {

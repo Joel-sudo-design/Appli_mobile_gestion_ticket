@@ -41,13 +41,13 @@
                 android:paddingBottom="10dp"
                 android:textColor="@color/black"
                 android:textSize="18sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/tiret"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/category"
@@ -56,7 +56,7 @@
                 android:padding="10dp"
                 android:textColor="@color/black"
                 android:textSize="18sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <ImageView
                 android:id="@+id/priority"
@@ -65,23 +65,7 @@
                 android:contentDescription="@string/attention"
                 android:padding="10dp"
                 android:textSize="18sp"
-                android:src="@drawable/warning"/>
-
-
-            <TextView
-                android:id="@+id/newTicket"
-                android:text="@string/NEW"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:padding="2dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:gravity="center"
-                android:layout_gravity="center"
-                android:textColor="@color/black"
-                android:background="@drawable/badge_new"
-                android:textSize="14sp"
-                android:textStyle="bold"/>
+                android:src="@drawable/warning" />
 
         </LinearLayout>
 
@@ -92,19 +76,50 @@
             android:padding="10dp"
             android:textColor="@color/black"
             android:textSize="18sp"
-            android:layout_alignParentRight="true"/>
+            android:layout_alignParentRight="true" />
 
-        <TextView
-            android:id="@+id/title"
+        <!-- btnArrow est défini en premier afin d'être référencé par newTicket -->
+        <ImageView
+            android:id="@+id/btnArrow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/ticket_info"
+            android:layout_alignParentEnd="true"
+            android:contentDescription="@string/open_description"
+            android:src="@drawable/arrow_down" />
+
+        <TextView
+            android:id="@+id/newTicket"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/btnArrow"
+            android:layout_alignTop="@id/btnArrow"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:padding="4dp"
+            android:gravity="center"
+            android:text="@string/NEW"
+            android:textColor="@color/black"
+            android:background="@drawable/badge_new"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ticket_info"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@id/newTicket"
+            android:layout_alignTop="@id/btnArrow"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:paddingTop="0dp"
             android:paddingBottom="15dp"
             android:textColor="@color/black"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:ellipsize="end"
+            android:singleLine="true" />
 
         <View
             android:id="@+id/divider"
@@ -114,16 +129,6 @@
             android:layout_height="1dp"
             android:background="#000000"
             android:layout_alignBottom="@id/description" />
-
-        <ImageView
-            android:id="@+id/btnArrow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/open_description"
-            android:src="@drawable/arrow_down"
-            android:layout_below="@id/ticket_info"
-            android:layout_alignParentEnd="true"
-            android:layout_alignBottom="@id/title"/>
 
         <TextView
             android:id="@+id/description"
@@ -136,17 +141,17 @@
             android:paddingBottom="10dp"
             android:textColor="@color/black"
             android:textSize="16sp"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/answer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/description"
+            android:layout_below="@id/description"
             android:padding="10dp"
             android:textColor="@color/black"
             android:textSize="16sp"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
     </RelativeLayout>
 
