@@ -71,31 +71,26 @@ public class adapter extends RecyclerView.Adapter<adapter.ViewHolder> implements
         return new Filter() {
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
-                ArrayList<model> filterResults = new ArrayList<>();
+                ArrayList<model> filteredList = new ArrayList<>();
                 if (constraint == null || constraint.length() == 0) {
-                    filterResults.addAll(ticketsFiltered);
+                    filteredList.addAll(ticketsFiltered);
                 } else {
                     String filterPattern = constraint.toString().toLowerCase().trim();
                     for (model item : ticketsFiltered) {
-                        if (item.getTicketNumber().toLowerCase().contains(filterPattern)) {
-                            filterResults.add(item);
-                        }
-                        if (item.getCategory().toLowerCase().contains(filterPattern)) {
-                            filterResults.add(item);
-                        }
-                        if (item.getTitle().toLowerCase().contains(filterPattern)) {
-                            filterResults.add(item);
-                        }
-                        if (item.getDescription().toLowerCase().contains(filterPattern)) {
-                            filterResults.add(item);
-                        }
-                        if (item.getAnswer().toLowerCase().contains(filterPattern)) {
-                            filterResults.add(item);
+                        // Concaténer toutes les données du ticket en une seule chaîne
+                        String combinedText = (item.getTicketNumber() + " " +
+                                item.getCategory() + " " +
+                                item.getTitle() + " " +
+                                item.getDescription() + " " +
+                                item.getAnswer()).toLowerCase() + " " +
+                                item.getDate();
+                        if (combinedText.contains(filterPattern)) {
+                            filteredList.add(item);
                         }
                     }
                 }
                 FilterResults results = new FilterResults();
-                results.values = filterResults;
+                results.values = filteredList;
                 return results;
             }
 
