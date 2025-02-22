@@ -5,22 +5,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
-
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.appli_mobile.databinding.FragmentTicketsResolusBinding;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -38,8 +33,7 @@ public class fragment_tickets_resolus extends Fragment {
     public fragment_tickets_resolus() {
     }
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentTicketsResolusBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         recyclerView = binding.fragmentTicketsResolusRecyclerView;
@@ -68,73 +62,6 @@ public class fragment_tickets_resolus extends Fragment {
                 R.color.niit
         );
         return root;
-    }
-
-    protected void getTicketsNoBar(String username) {
-
-        JSONObject request = new JSONObject();
-        final Logger logger = Logger.getLogger(fragment_tickets_resolus.class.getName());
-        try {
-            request.put(KEY_USERNAME, username);
-
-        } catch (JSONException e) {
-            logger.severe(e.getMessage());
-        }
-
-        String login_url = "https://support.joeldermont.fr/resolved_ticket_android";
-        JsonObjectRequest jsArrayRequest = new JsonObjectRequest
-                (Request.Method.POST, login_url, request, response -> {
-                    try {
-
-                        if (response.getInt(KEY_STATUS) == 1) {
-                            tickets = new ArrayList<>();
-                            for (int i = 0; i < response.getJSONArray("resolvedTickets").length(); i++) {
-                                JSONObject ticketObj = response.getJSONArray("resolvedTickets").getJSONObject(i);
-                                String id = ticketObj.getString("id");
-                                String category = ticketObj.getString("category");
-                                String simplePriority = ticketObj.getString("priority");
-                                String priority = "priorité " + simplePriority.toLowerCase();
-                                String title = ticketObj.getString("title");
-                                String description = ticketObj.getString("description");
-                                String date = ticketObj.getString("date");
-                                boolean isopen = ticketObj.getBoolean("open");
-
-                                // Traitement du tableau "answers"
-                                JSONArray answersArray = ticketObj.getJSONArray("answers");
-                                String adminAnswer = "";
-                                String userAnswer = "";
-                                for (int j = 0; j < answersArray.length(); j++) {
-                                    JSONObject answerObj = answersArray.getJSONObject(j);
-                                    if (answerObj.has("admin")) {
-                                        adminAnswer = answerObj.getString("admin");
-                                    }
-                                    if (answerObj.has("user")) {
-                                        userAnswer = answerObj.getString("user");
-                                    }
-                                }
-                                String answer = "Admin: " + adminAnswer + "\nUser: " + userAnswer;
-
-                                // Création de l'objet modèle avec les réponses concaténées
-                                model model = new model(id, category, priority, title, description, answer, date, isopen);
-                                tickets.add(model);
-                            }
-                            adapter = new adapter(tickets);
-                            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                            recyclerView.setAdapter(adapter);
-                        }
-
-                        else if (response.getInt(KEY_STATUS) == 0) {
-                            Toast.makeText(requireActivity().getApplicationContext(),
-                                    response.getString(KEY_MESSAGE), Toast.LENGTH_SHORT).show();
-                        }
-
-                    } catch (JSONException e) {
-                        logger.severe(e.getMessage());
-                    }
-                }, error -> Toast.makeText(requireActivity().getApplicationContext(),
-                        error.getMessage(), Toast.LENGTH_SHORT).show());
-
-        MySingleton.getInstance(this.requireActivity().getApplicationContext()).addToRequestQueue(jsArrayRequest);
     }
 
     protected void getTickets(String username) {
