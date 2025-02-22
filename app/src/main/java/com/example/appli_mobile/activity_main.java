@@ -91,16 +91,6 @@ public class activity_main extends AppCompatActivity {
                 transaction.replace(R.id.frame_layout, newFragment).commit();
                 drawer.closeDrawers();
                 autoCompleteText.setText("");
-                autoCompleteText.setOnItemClickListener((parent, view, position, id1) -> {
-                    String itemFilter = parent.getItemAtPosition(position).toString();
-                    if (newFragment.adapter != null) {
-                        if (itemFilter.equals("Plus récent")) {
-                            newFragment.recentTickets();
-                        } else if (itemFilter.equals("Plus ancien")) {
-                            newFragment.oldTickets();
-                        }
-                    }
-                });
             } else if (item.getItemId() == R.id.nav_tickets_en_cours) {
                 ticket.setText(R.string.tickets_en_cours_main);
                 // Créer une nouvelle instance du fragment "Tickets en cours"
@@ -109,16 +99,6 @@ public class activity_main extends AppCompatActivity {
                 transaction.replace(R.id.frame_layout, newFragment).commit();
                 drawer.closeDrawers();
                 autoCompleteText.setText("");
-                autoCompleteText.setOnItemClickListener((parent, view, position, id1) -> {
-                    String itemFilter = parent.getItemAtPosition(position).toString();
-                    if (newFragment.adapter != null) {
-                        if (itemFilter.equals("Plus récent")) {
-                            newFragment.recentTickets();
-                        } else if (itemFilter.equals("Plus ancien")) {
-                            newFragment.oldTickets();
-                        }
-                    }
-                });
             } else if (item.getItemId() == R.id.nav_tickets_resolus) {
                 ticket.setText(R.string.tickets_r_solus_main);
                 // Créer une nouvelle instance du fragment "Tickets résolus"
@@ -127,16 +107,6 @@ public class activity_main extends AppCompatActivity {
                 transaction.replace(R.id.frame_layout, newFragment).commit();
                 drawer.closeDrawers();
                 autoCompleteText.setText("");
-                autoCompleteText.setOnItemClickListener((parent, view, position, id1) -> {
-                    String itemFilter = parent.getItemAtPosition(position).toString();
-                    if (newFragment.adapter != null) {
-                        if (itemFilter.equals("Plus récent")) {
-                            newFragment.recentTickets();
-                        } else if (itemFilter.equals("Plus ancien")) {
-                            newFragment.oldTickets();
-                        }
-                    }
-                });
             } else if (item.getItemId() == R.id.nav_btnLogout) {
                 Intent i1 = new Intent(activity_main.this, activity_login.class);
                 startActivity(i1);

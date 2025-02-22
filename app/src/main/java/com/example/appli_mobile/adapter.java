@@ -181,23 +181,17 @@ public class adapter extends RecyclerView.Adapter<adapter.ViewHolder> implements
 
     @SuppressLint("NotifyDataSetChanged")
     public void recentTickets() {
-        this.tickets.sort(new Comparator<model>() {
-            @Override
-            public int compare(model o1, model o2) {
-                return o2.getTicketNumber().compareTo(o1.getTicketNumber());
-            }
-        });
+        tickets.sort((o1, o2) -> o2.getTicketNumber().compareTo(o1.getTicketNumber()));
+        ticketsFiltered.clear();
+        ticketsFiltered.addAll(tickets);
         notifyDataSetChanged();
     }
 
     @SuppressLint("NotifyDataSetChanged")
     public void oldTickets() {
-        this.tickets.sort(new Comparator<model>() {
-            @Override
-            public int compare(model o1, model o2) {
-                return o1.getTicketNumber().compareTo(o2.getTicketNumber());
-            }
-        });
+        tickets.sort((o1, o2) -> o1.getTicketNumber().compareTo(o2.getTicketNumber()));
+        ticketsFiltered.clear();
+        ticketsFiltered.addAll(tickets);
         notifyDataSetChanged();
     }
 

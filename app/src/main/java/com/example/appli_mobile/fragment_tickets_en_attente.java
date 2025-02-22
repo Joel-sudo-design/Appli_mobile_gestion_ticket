@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -38,6 +39,17 @@ public class fragment_tickets_en_attente extends Fragment {
         View root = binding.getRoot();
         recyclerView = binding.fragmentTicketsEnAttenteRecyclerView;
         swipeRefreshLayout = binding.swipeRefreshLayout;
+        AutoCompleteTextView autoCompleteText = requireActivity().findViewById(R.id.autoCompleteText);
+        autoCompleteText.setOnItemClickListener((parent, view1, position, id) -> {
+            String itemFilter = parent.getItemAtPosition(position).toString();
+            if (adapter != null) {
+                if (itemFilter.equals("Plus récent")) {
+                    recentTickets();
+                } else if (itemFilter.equals("Plus ancien")) {
+                    oldTickets();
+                }
+            }
+        });
         Bundle bundle = getArguments();
         assert bundle != null;
         String username = bundle.getString("username");
