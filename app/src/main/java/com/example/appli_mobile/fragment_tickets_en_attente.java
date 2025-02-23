@@ -1,7 +1,9 @@
 package com.example.appli_mobile;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
@@ -34,9 +36,20 @@ public class fragment_tickets_en_attente extends Fragment {
     public fragment_tickets_en_attente() {
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentTicketsEnAttenteBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        root.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                if (adapter != null) {
+                    adapter.collapseAll();
+                }
+            }
+            return false;
+        });
+
         recyclerView = binding.fragmentTicketsEnAttenteRecyclerView;
         swipeRefreshLayout = binding.swipeRefreshLayout;
         AutoCompleteTextView autoCompleteText = requireActivity().findViewById(R.id.autoCompleteText);
