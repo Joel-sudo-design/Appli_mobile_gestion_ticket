@@ -1,7 +1,9 @@
 package com.example.appli_mobile;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
@@ -34,11 +36,23 @@ public class fragment_tickets_en_cours extends Fragment {
     public fragment_tickets_en_cours() {
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentTicketsEnCoursBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        root.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                if (adapter != null) {
+                    adapter.collapseAll();
+                }
+            }
+            return false;
+        });
+
         recyclerView = binding.fragmentTicketsEnCoursRecyclerView;
         swipeRefreshLayout = binding.swipeRefreshLayout;
+
         AutoCompleteTextView autoCompleteText = requireActivity().findViewById(R.id.autoCompleteText);
         autoCompleteText.setOnItemClickListener((parent, view1, position, id) -> {
             String itemFilter = parent.getItemAtPosition(position).toString();
@@ -50,29 +64,27 @@ public class fragment_tickets_en_cours extends Fragment {
                 }
             }
         });
+
         Bundle bundle = getArguments();
         assert bundle != null;
         String username = bundle.getString("username");
         getTickets(username);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                // Créer une nouvelle instance du fragment et lui passer le même argument
-                fragment_tickets_en_cours newFragment = new fragment_tickets_en_cours();
-                Bundle newBundle = new Bundle();
-                newBundle.putString("username", username);
-                newFragment.setArguments(newBundle);
 
-                // Remplacer le fragment actuel par la nouvelle instance
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.frame_layout, newFragment)
-                        .commit();
-                swipeRefreshLayout.setRefreshing(false);
-            }
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            // Créer une nouvelle instance du fragment et lui passer le même argument
+            fragment_tickets_en_cours newFragment = new fragment_tickets_en_cours();
+            Bundle newBundle = new Bundle();
+            newBundle.putString("username", username);
+            newFragment.setArguments(newBundle);
+
+            // Remplacer le fragment actuel par la nouvelle instance
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, newFragment)
+                    .commit();
+            swipeRefreshLayout.setRefreshing(false);
         });
-        swipeRefreshLayout.setColorSchemeResources(
-                R.color.niit
-        );
+
+        swipeRefreshLayout.setColorSchemeResources(R.color.niit);
         return root;
     }
 

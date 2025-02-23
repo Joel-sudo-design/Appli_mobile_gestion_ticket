@@ -122,7 +122,7 @@ public class adapter extends RecyclerView.Adapter<adapter.ViewHolder> implements
         viewholder.answer.setText(Html.fromHtml(model.getAnswer()));
         viewholder.date.setText(model.getDate());
 
-        boolean isExpanded = position == expandedPosition == !com.example.appli_mobile.model.isExpanded();
+        boolean isExpanded = (position == expandedPosition);
         viewholder.description.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
         viewholder.answer.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
         if (!isExpanded) {
@@ -177,6 +177,11 @@ public class adapter extends RecyclerView.Adapter<adapter.ViewHolder> implements
                         error.getMessage(), Toast.LENGTH_SHORT).show());
 
         MySingleton.getInstance(context).addToRequestQueue(jsArrayRequest);
+    }
+
+    public void collapseAll() {
+        expandedPosition = -1;
+        notifyDataSetChanged();
     }
 
     @SuppressLint("NotifyDataSetChanged")
