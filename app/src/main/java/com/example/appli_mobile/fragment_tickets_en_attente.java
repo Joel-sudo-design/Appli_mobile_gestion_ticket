@@ -107,7 +107,7 @@ public class fragment_tickets_en_attente extends Fragment {
             logger.severe(e.getMessage());
         }
 
-        String tickets_url = "https://support.joeldermont.fr/waiting_ticket_android";
+        String tickets_url = "https://support.joeldermont.fr/api/waiting_ticket_android";
         JsonObjectRequest jsArrayRequest = new JsonObjectRequest(
                 Request.Method.POST,
                 tickets_url,
@@ -145,8 +145,13 @@ public class fragment_tickets_en_attente extends Fragment {
                         logger.severe(e.getMessage());
                     }
                 },
-                error -> Toast.makeText(requireActivity().getApplicationContext(),
-                        error.getMessage(), Toast.LENGTH_SHORT).show()
+                error -> {
+                    String errorMessage = error.getMessage();
+                    if (errorMessage == null || errorMessage.isEmpty()) {
+                        errorMessage = "Une erreur s'est produite";
+                    }
+                    Toast.makeText(requireActivity().getApplicationContext(), errorMessage, Toast.LENGTH_SHORT).show();
+                }
         ) {
             @Override
             public Map<String, String> getHeaders() {
