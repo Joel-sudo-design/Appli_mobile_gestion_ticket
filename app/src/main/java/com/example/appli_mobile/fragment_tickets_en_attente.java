@@ -20,6 +20,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class fragment_tickets_en_attente extends Fragment {
@@ -33,8 +35,7 @@ public class fragment_tickets_en_attente extends Fragment {
     private static final String KEY_STATUS = "status";
     private static final String KEY_MESSAGE = "message";
 
-    public fragment_tickets_en_attente() {
-    }
+    public fragment_tickets_en_attente() {}
 
     @SuppressLint("ClickableViewAccessibility")
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -66,7 +67,8 @@ public class fragment_tickets_en_attente extends Fragment {
         Bundle bundle = getArguments();
         assert bundle != null;
         String username = bundle.getString("username");
-        getTickets(username);
+        String token = bundle.getString("token");
+        getTickets(username, token);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -95,8 +97,7 @@ public class fragment_tickets_en_attente extends Fragment {
         }
     }
 
-    protected void getTickets(String username) {
-
+    protected void getTickets(String username, String token) {
         binding.indeterminateBar.setVisibility(View.VISIBLE);
         JSONObject request = new JSONObject();
         final Logger logger = Logger.getLogger(fragment_tickets_en_attente.class.getName());
@@ -106,10 +107,10 @@ public class fragment_tickets_en_attente extends Fragment {
             logger.severe(e.getMessage());
         }
 
-        String login_url = "https://support.joeldermont.fr/waiting_ticket_android";
+        String tickets_url = "https://support.joeldermont.fr/waiting_ticket_android";
         JsonObjectRequest jsArrayRequest = new JsonObjectRequest(
                 Request.Method.POST,
-                login_url,
+                tickets_url,
                 request,
                 response -> {
                     try {
@@ -118,40 +119,17 @@ public class fragment_tickets_en_attente extends Fragment {
                             JSONArray waitingTickets = response.getJSONArray("waitingTickets");
                             for (int i = 0; i < waitingTickets.length(); i++) {
                                 JSONObject ticketObj = waitingTickets.getJSONObject(i);
-                                String id = ticketObj.getString("id");
-                                String category = ticketObj.getString("category");
-                                String simplePriority = ticketObj.getString("priority");
-                                String priority = "priorité " + simplePriority.toLowerCase();
-                                String title = ticketObj.getString("title");
-                                String description = ticketObj.getString("description");
-                                String date = ticketObj.getString("date");
-                                boolean isopen = ticketObj.getBoolean("open");
-
-                                // Traitement du tableau "answers"
-                                String answer = "";
-                                if (ticketObj.has("answers")) {
-                                    JSONArray answersArray = ticketObj.getJSONArray("answers");
-                                    if (answersArray.length() > 0) {
-                                        StringBuilder answerBuilder = new StringBuilder();
-                                        for (int j = 0; j < answersArray.length(); j++) {
-                                            JSONObject answerObj = answersArray.getJSONObject(j);
-                                            if (answerObj.has("admin") && !answerObj.getString("admin").isEmpty()) {
-                                                answerBuilder.append("<b>Admin:</b> ")
-                                                        .append(answerObj.getString("admin"))
-                                                        .append("<br/><br/>");
-                                            }
-                                            if (answerObj.has("user") && !answerObj.getString("user").isEmpty()) {
-                                                answerBuilder.append("<b>User:</b> ")
-                                                        .append(answerObj.getString("user"))
-                                                        .append("<br/><br/>");
-                                            }
-                                        }
-                                        answer = answerBuilder.toString().trim();
-                                    }
-                                }
-
-                                // Création de l'objet modèle avec la chaîne answer formatée (ou vide)
-                                model modelObj = new model(id, category, priority, title, description, answer, date, isopen);
+                                // Traitement des informations du ticket...
+                                model modelObj = new model(
+                                        ticketObj.getString("id"),
+                                        ticketObj.getString("category"),
+                                        "priorité " + ticketObj.getString("priority").toLowerCase(),
+                                        ticketObj.getString("title"),
+                                        ticketObj.getString("description"),
+                                        ticketObj.has("answers") ? ticketObj.getJSONArray("answers").toString() : "",
+                                        ticketObj.getString("date"),
+                                        ticketObj.getBoolean("open")
+                                );
                                 tickets.add(modelObj);
                             }
                             binding.indeterminateBar.setVisibility(View.INVISIBLE);
@@ -168,9 +146,17 @@ public class fragment_tickets_en_attente extends Fragment {
                     }
                 },
                 error -> Toast.makeText(requireActivity().getApplicationContext(),
-                        error.getMessage(), Toast.LENGTH_SHORT).show());
+                        error.getMessage(), Toast.LENGTH_SHORT).show()
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + token); // Ajout de l'en-tête avec le token
+                return headers;
+            }
+        };
 
-        MySingleton.getInstance(this.requireActivity().getApplicationContext()).addToRequestQueue(jsArrayRequest);
+        MySingleton.getInstance(requireActivity().getApplicationContext()).addToRequestQueue(jsArrayRequest);
     }
 
     public void recentTickets() {

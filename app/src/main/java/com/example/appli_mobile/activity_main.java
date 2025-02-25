@@ -38,10 +38,13 @@ public class activity_main extends AppCompatActivity {
         NavigationView navigationView = binding.navView;
         DrawerLayout drawer = binding.drawerLayout;
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
+
+        // Récupération des données de l'Intent (username et token)
         Intent i = getIntent();
         String username = i.getStringExtra("username");
+        String token = i.getStringExtra("token");
 
-        // Toolbar
+        // Toolbar configuration
         setSupportActionBar(binding.appBarMain.toolbar);
         binding.appBarMain.toolbar.setTitleCentered(true);
         Drawable filter = ResourcesCompat.getDrawable(getResources(), R.drawable.filter, null);
@@ -50,12 +53,12 @@ public class activity_main extends AppCompatActivity {
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        // Filter
+        // Filter configuration
         autoCompleteText = findViewById(R.id.autoCompleteText);
         adapter_filter adapter = new adapter_filter(this, items);
         autoCompleteText.setAdapter(adapter);
 
-        // Affichage Fragment par défaut
+        // Affichage du fragment par défaut avec le Bundle contenant username et token
         TextView ticket = findViewById(R.id.ticket);
         if (savedInstanceState == null) {
             autoCompleteText.setOnItemClickListener((parent, view, position, id) -> {
@@ -72,20 +75,22 @@ public class activity_main extends AppCompatActivity {
             Objects.requireNonNull(getSupportActionBar()).setTitle("Bienvenue " + username);
             Bundle bundle = new Bundle();
             bundle.putString("username", username);
+            bundle.putString("token", token); // Transmission du token
+            fragment_tickets_en_attente fragmentTicketsEnAttente = new fragment_tickets_en_attente();
             fragmentTicketsEnAttente.setArguments(bundle);
             getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, fragmentTicketsEnAttente).commit();
             navigationView.setCheckedItem(R.id.nav_tickets_en_attente);
         }
 
-        // Navigation Drawer
+        // Navigation Drawer : passage du Bundle avec username et token aux fragments sélectionnés
         navigationView.setNavigationItemSelectedListener(item -> {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             Bundle bundle = new Bundle();
             bundle.putString("username", username);
+            bundle.putString("token", token); // Ajout du token dans le Bundle
 
             if (item.getItemId() == R.id.nav_tickets_en_attente) {
                 ticket.setText(R.string.tickets_en_attente_main);
-                // Créer une nouvelle instance du fragment "Tickets en attente"
                 fragment_tickets_en_attente newFragment = new fragment_tickets_en_attente();
                 newFragment.setArguments(bundle);
                 transaction.replace(R.id.frame_layout, newFragment).commit();
@@ -93,7 +98,6 @@ public class activity_main extends AppCompatActivity {
                 autoCompleteText.setText("");
             } else if (item.getItemId() == R.id.nav_tickets_en_cours) {
                 ticket.setText(R.string.tickets_en_cours_main);
-                // Créer une nouvelle instance du fragment "Tickets en cours"
                 fragment_tickets_en_cours newFragment = new fragment_tickets_en_cours();
                 newFragment.setArguments(bundle);
                 transaction.replace(R.id.frame_layout, newFragment).commit();
@@ -101,7 +105,6 @@ public class activity_main extends AppCompatActivity {
                 autoCompleteText.setText("");
             } else if (item.getItemId() == R.id.nav_tickets_resolus) {
                 ticket.setText(R.string.tickets_r_solus_main);
-                // Créer une nouvelle instance du fragment "Tickets résolus"
                 fragment_tickets_resolus newFragment = new fragment_tickets_resolus();
                 newFragment.setArguments(bundle);
                 transaction.replace(R.id.frame_layout, newFragment).commit();
@@ -112,10 +115,8 @@ public class activity_main extends AppCompatActivity {
                 startActivity(i1);
                 finish();
             }
-
             return true;
         });
-
     }
 
     @Override

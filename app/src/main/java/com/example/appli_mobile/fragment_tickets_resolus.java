@@ -33,8 +33,7 @@ public class fragment_tickets_resolus extends Fragment {
     private static final String KEY_STATUS = "status";
     private static final String KEY_MESSAGE = "message";
 
-    public fragment_tickets_resolus() {
-    }
+    public fragment_tickets_resolus() {}
 
     @SuppressLint("ClickableViewAccessibility")
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

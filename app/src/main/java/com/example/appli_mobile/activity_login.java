@@ -58,9 +58,10 @@ public class activity_login extends AppCompatActivity {
             }
         });
     }
-    private void loadMain() {
+    private void loadMain(String token) {
         Intent i = new Intent(getApplicationContext(), activity_main.class);
         i.putExtra("username", username);
+        i.putExtra("token", token);
         startActivity(i);
         finish();
     }
@@ -75,29 +76,26 @@ public class activity_login extends AppCompatActivity {
         } catch (JSONException e) {
             logger.severe(e.getMessage());
         }
-
-        String login_url = "https://support.joeldermont.fr/LoginAndroid";
+        String login_url = "https://support.joeldermont.fr/api/login";
         JsonObjectRequest jsArrayRequest = new JsonObjectRequest
                 (Request.Method.POST, login_url, request, response -> {
                     try {
-
-                        if (response.getInt(KEY_STATUS) == 1) {
-                            loadMain();
-                        }
-
-                        else if (response.getInt(KEY_STATUS) == 0) {
+                        if (response.has("token")) {
+                            String token = response.getString("token");
+                            loadMain(token);
+                        } else if (response.has("error")) {
                             Toast.makeText(getApplicationContext(),
-                                    response.getString(KEY_MESSAGE), Toast.LENGTH_SHORT).show();
+                                    response.getString("error"), Toast.LENGTH_SHORT).show();
                             binding.indeterminateBar.setVisibility(View.INVISIBLE);
                             binding.btnLogin.setBackgroundColor(Color.WHITE);
                         }
-
                     } catch (JSONException e) {
                         logger.severe(e.getMessage());
                     }
-                }, error -> Toast.makeText(getApplicationContext(),
-                        error.getMessage(), Toast.LENGTH_SHORT).show());
-
+                },
+                        error -> Toast.makeText(getApplicationContext(),
+                                error.getMessage(), Toast.LENGTH_SHORT).show()
+                );
         MySingleton.getInstance(this).addToRequestQueue(jsArrayRequest);
     }
     private boolean validateInputs() {
