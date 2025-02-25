@@ -151,8 +151,8 @@ public class fragment_tickets_en_attente extends Fragment {
                         errorMessage = "Une erreur s'est produite";
                     }
                     Toast.makeText(requireActivity().getApplicationContext(), errorMessage, Toast.LENGTH_SHORT).show();
-                }
-        ) {
+                })
+        {
             @Override
             public Map<String, String> getHeaders() {
                 Map<String, String> headers = new HashMap<>();

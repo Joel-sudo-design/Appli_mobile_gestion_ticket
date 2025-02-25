@@ -8,18 +8,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.appli_mobile.databinding.FragmentTicketsEnCoursBinding;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class fragment_tickets_en_cours extends Fragment {
@@ -27,25 +33,23 @@ public class fragment_tickets_en_cours extends Fragment {
     private FragmentTicketsEnCoursBinding binding;
     private SwipeRefreshLayout swipeRefreshLayout;
     ArrayList<model> tickets;
-    RecyclerView recyclerView;
     adapter adapter;
+    RecyclerView recyclerView;
     private static final String KEY_USERNAME = "username";
     private static final String KEY_STATUS = "status";
     private static final String KEY_MESSAGE = "message";
 
-    public fragment_tickets_en_cours() {
-    }
+    public fragment_tickets_en_cours() {}
 
     @SuppressLint("ClickableViewAccessibility")
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentTicketsEnCoursBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         root.setOnTouchListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                if (adapter != null) {
-                    adapter.collapseAll();
-                }
+            if (event.getAction() == MotionEvent.ACTION_DOWN && adapter != null) {
+                adapter.collapseAll();
             }
             return false;
         });
@@ -68,13 +72,15 @@ public class fragment_tickets_en_cours extends Fragment {
         Bundle bundle = getArguments();
         assert bundle != null;
         String username = bundle.getString("username");
-        getTickets(username);
+        String token = bundle.getString("token");
+        getTickets(username, token);
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
-            // Créer une nouvelle instance du fragment et lui passer le même argument
+            // Créer une nouvelle instance du fragment en passant username et token
             fragment_tickets_en_cours newFragment = new fragment_tickets_en_cours();
             Bundle newBundle = new Bundle();
             newBundle.putString("username", username);
+            newBundle.putString("token", token);
             newFragment.setArguments(newBundle);
 
             // Remplacer le fragment actuel par la nouvelle instance
@@ -88,8 +94,7 @@ public class fragment_tickets_en_cours extends Fragment {
         return root;
     }
 
-    protected void getTickets(String username) {
-
+    protected void getTickets(String username, String token) {
         binding.indeterminateBar.setVisibility(View.VISIBLE);
         JSONObject request = new JSONObject();
         final Logger logger = Logger.getLogger(fragment_tickets_en_cours.class.getName());
@@ -99,10 +104,11 @@ public class fragment_tickets_en_cours extends Fragment {
             logger.severe(e.getMessage());
         }
 
-        String login_url = "https://support.joeldermont.fr/in_Progress_ticket_android";
+        // URL corrigée pour les tickets en cours
+        String tickets_url = "https://support.joeldermont.fr/api/in_progress_ticket_android";
         JsonObjectRequest jsArrayRequest = new JsonObjectRequest(
                 Request.Method.POST,
-                login_url,
+                tickets_url,
                 request,
                 response -> {
                     try {
@@ -155,10 +161,24 @@ public class fragment_tickets_en_cours extends Fragment {
                         logger.severe(e.getMessage());
                     }
                 },
-                error -> Toast.makeText(requireActivity().getApplicationContext(),
-                        error.getMessage(), Toast.LENGTH_SHORT).show());
+                error -> {
+                    String errorMessage = error.getMessage();
+                    if (errorMessage == null || errorMessage.isEmpty()) {
+                        errorMessage = "Une erreur s'est produite";
+                    }
+                    Toast.makeText(requireActivity().getApplicationContext(), errorMessage, Toast.LENGTH_SHORT).show();
+                })
+        {
+            @Override
+            public Map<String, String> getHeaders() {
+                // Ajout de l'en-tête avec le token
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + token);
+                return headers;
+            }
+        };
 
-        MySingleton.getInstance(this.requireActivity().getApplicationContext()).addToRequestQueue(jsArrayRequest);
+        MySingleton.getInstance(requireActivity().getApplicationContext()).addToRequestQueue(jsArrayRequest);
     }
 
     public void filter(String query) {

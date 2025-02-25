@@ -8,18 +8,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.appli_mobile.databinding.FragmentTicketsResolusBinding;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class fragment_tickets_resolus extends Fragment {
@@ -27,8 +33,8 @@ public class fragment_tickets_resolus extends Fragment {
     private FragmentTicketsResolusBinding binding;
     private SwipeRefreshLayout swipeRefreshLayout;
     ArrayList<model> tickets;
-    RecyclerView recyclerView;
     adapter adapter;
+    RecyclerView recyclerView;
     private static final String KEY_USERNAME = "username";
     private static final String KEY_STATUS = "status";
     private static final String KEY_MESSAGE = "message";
@@ -36,21 +42,21 @@ public class fragment_tickets_resolus extends Fragment {
     public fragment_tickets_resolus() {}
 
     @SuppressLint("ClickableViewAccessibility")
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentTicketsResolusBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         root.setOnTouchListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                if (adapter != null) {
-                    adapter.collapseAll();
-                }
+            if (event.getAction() == MotionEvent.ACTION_DOWN && adapter != null) {
+                adapter.collapseAll();
             }
             return false;
         });
 
         recyclerView = binding.fragmentTicketsResolusRecyclerView;
         swipeRefreshLayout = binding.swipeRefreshLayout;
+
         AutoCompleteTextView autoCompleteText = requireActivity().findViewById(R.id.autoCompleteText);
         autoCompleteText.setOnItemClickListener((parent, view1, position, id) -> {
             String itemFilter = parent.getItemAtPosition(position).toString();
@@ -62,34 +68,33 @@ public class fragment_tickets_resolus extends Fragment {
                 }
             }
         });
+
         Bundle bundle = getArguments();
         assert bundle != null;
         String username = bundle.getString("username");
-        getTickets(username);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                // Créer une nouvelle instance du fragment et lui passer le même argument
-                fragment_tickets_resolus newFragment = new fragment_tickets_resolus();
-                Bundle newBundle = new Bundle();
-                newBundle.putString("username", username);
-                newFragment.setArguments(newBundle);
+        String token = bundle.getString("token");
+        getTickets(username, token);
 
-                // Remplacer le fragment actuel par la nouvelle instance
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.frame_layout, newFragment)
-                        .commit();
-                swipeRefreshLayout.setRefreshing(false);
-            }
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            // Créer une nouvelle instance du fragment en passant username et token
+            fragment_tickets_resolus newFragment = new fragment_tickets_resolus();
+            Bundle newBundle = new Bundle();
+            newBundle.putString("username", username);
+            newBundle.putString("token", token);
+            newFragment.setArguments(newBundle);
+
+            // Remplacer le fragment actuel par la nouvelle instance
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, newFragment)
+                    .commit();
+            swipeRefreshLayout.setRefreshing(false);
         });
-        swipeRefreshLayout.setColorSchemeResources(
-                R.color.niit
-        );
+
+        swipeRefreshLayout.setColorSchemeResources(R.color.niit);
         return root;
     }
 
-    protected void getTickets(String username) {
-
+    protected void getTickets(String username, String token) {
         binding.indeterminateBar.setVisibility(View.VISIBLE);
         JSONObject request = new JSONObject();
         final Logger logger = Logger.getLogger(fragment_tickets_resolus.class.getName());
@@ -99,10 +104,11 @@ public class fragment_tickets_resolus extends Fragment {
             logger.severe(e.getMessage());
         }
 
-        String login_url = "https://support.joeldermont.fr/resolved_ticket_android";
+        // URL pour les tickets résolus
+        String tickets_url = "https://support.joeldermont.fr/api/resolved_ticket_android";
         JsonObjectRequest jsArrayRequest = new JsonObjectRequest(
                 Request.Method.POST,
-                login_url,
+                tickets_url,
                 request,
                 response -> {
                     try {
@@ -121,29 +127,24 @@ public class fragment_tickets_resolus extends Fragment {
                                 boolean isopen = ticketObj.getBoolean("open");
 
                                 // Traitement du tableau "answers" avec format HTML
-                                String answer = "";
-                                if (ticketObj.has("answers")) {
-                                    JSONArray answersArray = ticketObj.getJSONArray("answers");
-                                    if (answersArray.length() > 0) {
-                                        StringBuilder answerBuilder = new StringBuilder();
-                                        for (int j = 0; j < answersArray.length(); j++) {
-                                            JSONObject answerObj = answersArray.getJSONObject(j);
-                                            if (answerObj.has("admin") && !answerObj.getString("admin").isEmpty()) {
-                                                answerBuilder.append("<b>Admin:</b> ")
-                                                        .append(answerObj.getString("admin"))
-                                                        .append("<br/><br/>");
-                                            }
-                                            if (answerObj.has("user") && !answerObj.getString("user").isEmpty()) {
-                                                answerBuilder.append("<b>User:</b> ")
-                                                        .append(answerObj.getString("user"))
-                                                        .append("<br/><br/>");
-                                            }
-                                        }
-                                        answer = answerBuilder.toString().trim();
+                                JSONArray answersArray = ticketObj.getJSONArray("answers");
+                                StringBuilder answerBuilder = new StringBuilder();
+                                for (int j = 0; j < answersArray.length(); j++) {
+                                    JSONObject answerObj = answersArray.getJSONObject(j);
+                                    if (answerObj.has("admin") && !answerObj.getString("admin").isEmpty()) {
+                                        answerBuilder.append("<b>Admin:</b> ")
+                                                .append(answerObj.getString("admin"))
+                                                .append("<br/><br/>");
+                                    }
+                                    if (answerObj.has("user") && !answerObj.getString("user").isEmpty()) {
+                                        answerBuilder.append("<b>User:</b> ")
+                                                .append(answerObj.getString("user"))
+                                                .append("<br/><br/>");
                                     }
                                 }
+                                String answer = answerBuilder.toString().trim();
 
-                                // Création de l'objet modèle avec la chaîne answer formatée (ou vide)
+                                // Création de l'objet modèle avec la chaîne answer formatée
                                 model modelObj = new model(id, category, priority, title, description, answer, date, isopen);
                                 tickets.add(modelObj);
                             }
@@ -160,10 +161,24 @@ public class fragment_tickets_resolus extends Fragment {
                         logger.severe(e.getMessage());
                     }
                 },
-                error -> Toast.makeText(requireActivity().getApplicationContext(),
-                        error.getMessage(), Toast.LENGTH_SHORT).show());
+                error -> {
+                    String errorMessage = error.getMessage();
+                    if (errorMessage == null || errorMessage.isEmpty()) {
+                        errorMessage = "Une erreur s'est produite";
+                    }
+                    Toast.makeText(requireActivity().getApplicationContext(), errorMessage, Toast.LENGTH_SHORT).show();
+                })
+        {
+            @Override
+            public Map<String, String> getHeaders() {
+                // Ajout de l'en-tête avec le token
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + token);
+                return headers;
+            }
+        };
 
-        MySingleton.getInstance(this.requireActivity().getApplicationContext()).addToRequestQueue(jsArrayRequest);
+        MySingleton.getInstance(requireActivity().getApplicationContext()).addToRequestQueue(jsArrayRequest);
     }
 
     public void filter(String query) {
