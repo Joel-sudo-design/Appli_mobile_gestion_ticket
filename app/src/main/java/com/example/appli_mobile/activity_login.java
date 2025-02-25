@@ -93,8 +93,13 @@ public class activity_login extends AppCompatActivity {
                         logger.severe(e.getMessage());
                     }
                 },
-                        error -> Toast.makeText(getApplicationContext(),
-                                error.getMessage(), Toast.LENGTH_SHORT).show()
+                        error -> {
+                            String errorMessage = error.getMessage();
+                            if (errorMessage == null || errorMessage.isEmpty()) {
+                                errorMessage = "Une erreur s'est produite";
+                            }
+                            Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_SHORT).show();
+                        }
                 );
         MySingleton.getInstance(this).addToRequestQueue(jsArrayRequest);
     }
