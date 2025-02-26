@@ -162,7 +162,6 @@ public class fragment_tickets_en_cours extends Fragment {
         MySingleton.getInstance(requireActivity().getApplicationContext()).addToRequestQueue(jsArrayRequest);
     }
 
-
     public void recentTickets() {
         adapter.recentTickets();
     }

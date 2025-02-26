@@ -26,6 +26,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -155,19 +157,26 @@ public class adapter extends RecyclerView.Adapter<adapter.ViewHolder> implements
     }
 
     private void setIsopen(String id, Context context) {
+        String token = "";
+        if (context instanceof android.app.Activity) {
+            token = ((android.app.Activity) context).getIntent().getStringExtra("token");
+        }
 
         JSONObject request = new JSONObject();
         final Logger logger = Logger.getLogger(adapter.class.getName());
         try {
             request.put(KEY_ID, id);
-
         } catch (JSONException e) {
             logger.severe(e.getMessage());
         }
 
-        String login_url = "https://support.joeldermont.fr/api/open_ticket_android";
-        JsonObjectRequest jsArrayRequest = new JsonObjectRequest
-                (Request.Method.POST, login_url, request, response -> {
+        String url = "https://support.joeldermont.fr/api/open_ticket_android";
+        String finalToken = token;
+        JsonObjectRequest jsArrayRequest = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                request,
+                response -> {
                     try {
                         if (response.getString(KEY_SUCCESS).equals("Ticket ouvert avec succès")) {
                             Log.i("Success", response.getString(KEY_SUCCESS));
@@ -177,8 +186,16 @@ public class adapter extends RecyclerView.Adapter<adapter.ViewHolder> implements
                     } catch (JSONException e) {
                         logger.severe(e.getMessage());
                     }
-                }, error -> Toast.makeText(context,
-                        error.getMessage(), Toast.LENGTH_SHORT).show());
+                },
+                error -> Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show()
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + finalToken);
+                return headers;
+            }
+        };
 
         MySingleton.getInstance(context).addToRequestQueue(jsArrayRequest);
     }
