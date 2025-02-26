@@ -8,21 +8,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.appli_mobile.databinding.FragmentTicketsResolusBinding;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -94,6 +90,12 @@ public class fragment_tickets_resolus extends Fragment {
         return root;
     }
 
+    public void filter(String query) {
+        if (tickets != null) {
+            adapter.getFilter().filter(query);
+        }
+    }
+
     protected void getTickets(String username, String token) {
         binding.indeterminateBar.setVisibility(View.VISIBLE);
         JSONObject request = new JSONObject();
@@ -104,7 +106,6 @@ public class fragment_tickets_resolus extends Fragment {
             logger.severe(e.getMessage());
         }
 
-        // URL pour les tickets résolus
         String tickets_url = "https://support.joeldermont.fr/api/resolved_ticket_android";
         JsonObjectRequest jsArrayRequest = new JsonObjectRequest(
                 Request.Method.POST,
@@ -114,38 +115,19 @@ public class fragment_tickets_resolus extends Fragment {
                     try {
                         if (response.getInt(KEY_STATUS) == 1) {
                             tickets = new ArrayList<>();
-                            JSONArray resolvedTickets = response.getJSONArray("resolvedTickets");
-                            for (int i = 0; i < resolvedTickets.length(); i++) {
-                                JSONObject ticketObj = resolvedTickets.getJSONObject(i);
-                                String id = ticketObj.getString("id");
-                                String category = ticketObj.getString("category");
-                                String simplePriority = ticketObj.getString("priority");
-                                String priority = "priorité " + simplePriority.toLowerCase();
-                                String title = ticketObj.getString("title");
-                                String description = ticketObj.getString("description");
-                                String date = ticketObj.getString("date");
-                                boolean isopen = ticketObj.getBoolean("open");
-
-                                // Traitement du tableau "answers" avec format HTML
-                                JSONArray answersArray = ticketObj.getJSONArray("answers");
-                                StringBuilder answerBuilder = new StringBuilder();
-                                for (int j = 0; j < answersArray.length(); j++) {
-                                    JSONObject answerObj = answersArray.getJSONObject(j);
-                                    if (answerObj.has("admin") && !answerObj.getString("admin").isEmpty()) {
-                                        answerBuilder.append("<b>Admin:</b> ")
-                                                .append(answerObj.getString("admin"))
-                                                .append("<br/><br/>");
-                                    }
-                                    if (answerObj.has("user") && !answerObj.getString("user").isEmpty()) {
-                                        answerBuilder.append("<b>User:</b> ")
-                                                .append(answerObj.getString("user"))
-                                                .append("<br/><br/>");
-                                    }
-                                }
-                                String answer = answerBuilder.toString().trim();
-
-                                // Création de l'objet modèle avec la chaîne answer formatée
-                                model modelObj = new model(id, category, priority, title, description, answer, date, isopen);
+                            JSONArray waitingTickets = response.getJSONArray("resolvedTickets");
+                            for (int i = 0; i < waitingTickets.length(); i++) {
+                                JSONObject ticketObj = waitingTickets.getJSONObject(i);
+                                model modelObj = new model(
+                                        ticketObj.getString("id"),
+                                        ticketObj.getString("category"),
+                                        "priorité " + ticketObj.getString("priority").toLowerCase(),
+                                        ticketObj.getString("title"),
+                                        ticketObj.getString("description"),
+                                        ticketObj.has("answers") ? ticketObj.getJSONArray("answers").toString() : "",
+                                        ticketObj.getString("date"),
+                                        ticketObj.getBoolean("open")
+                                );
                                 tickets.add(modelObj);
                             }
                             binding.indeterminateBar.setVisibility(View.INVISIBLE);
@@ -171,7 +153,6 @@ public class fragment_tickets_resolus extends Fragment {
         {
             @Override
             public Map<String, String> getHeaders() {
-                // Ajout de l'en-tête avec le token
                 Map<String, String> headers = new HashMap<>();
                 headers.put("Authorization", "Bearer " + token);
                 return headers;
@@ -179,12 +160,6 @@ public class fragment_tickets_resolus extends Fragment {
         };
 
         MySingleton.getInstance(requireActivity().getApplicationContext()).addToRequestQueue(jsArrayRequest);
-    }
-
-    public void filter(String query) {
-        if (tickets != null) {
-            adapter.getFilter().filter(query);
-        }
     }
 
     public void recentTickets() {

@@ -38,6 +38,7 @@ public class fragment_tickets_en_attente extends Fragment {
     public fragment_tickets_en_attente() {}
 
     @SuppressLint("ClickableViewAccessibility")
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentTicketsEnAttenteBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -69,6 +70,7 @@ public class fragment_tickets_en_attente extends Fragment {
         String username = bundle.getString("username");
         String token = bundle.getString("token");
         getTickets(username, token);
+
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -120,7 +122,6 @@ public class fragment_tickets_en_attente extends Fragment {
                             JSONArray waitingTickets = response.getJSONArray("waitingTickets");
                             for (int i = 0; i < waitingTickets.length(); i++) {
                                 JSONObject ticketObj = waitingTickets.getJSONObject(i);
-                                // Traitement des informations du ticket...
                                 model modelObj = new model(
                                         ticketObj.getString("id"),
                                         ticketObj.getString("category"),
@@ -157,7 +158,7 @@ public class fragment_tickets_en_attente extends Fragment {
             @Override
             public Map<String, String> getHeaders() {
                 Map<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Bearer " + token); // Ajout de l'en-tête avec le token
+                headers.put("Authorization", "Bearer " + token);
                 return headers;
             }
         };
