@@ -76,7 +76,7 @@ public class activity_login extends AppCompatActivity {
         } catch (JSONException e) {
             logger.severe(e.getMessage());
         }
-        String login_url = "https://support.joeldermont.fr/api/login";
+        String login_url = "https://support.joeldermont.fr/login_api";
         JsonObjectRequest jsArrayRequest = new JsonObjectRequest
                 (Request.Method.POST, login_url, request, response -> {
                     try {

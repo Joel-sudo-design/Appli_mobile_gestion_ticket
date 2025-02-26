@@ -35,6 +35,8 @@ public class adapter extends RecyclerView.Adapter<adapter.ViewHolder> implements
     private final ArrayList<model> ticketsFiltered;
     private static final String KEY_ID = "id";
     private static final String KEY_SUCCESS = "success";
+    private static final String KEY_STATUS = "status";
+    private static final String KEY_MESSAGE = "message";
     private int expandedPosition = -1;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -163,12 +165,14 @@ public class adapter extends RecyclerView.Adapter<adapter.ViewHolder> implements
             logger.severe(e.getMessage());
         }
 
-        String login_url = "https://support.joeldermont.fr/open_ticket_android";
+        String login_url = "https://support.joeldermont.fr/api/open_ticket_android";
         JsonObjectRequest jsArrayRequest = new JsonObjectRequest
                 (Request.Method.POST, login_url, request, response -> {
                     try {
                         if (response.getString(KEY_SUCCESS).equals("Ticket ouvert avec succès")) {
                             Log.i("Success", response.getString(KEY_SUCCESS));
+                        } else if (response.getInt(KEY_STATUS) == 0) {
+                            Log.i("Error", response.getString(KEY_MESSAGE));
                         }
                     } catch (JSONException e) {
                         logger.severe(e.getMessage());

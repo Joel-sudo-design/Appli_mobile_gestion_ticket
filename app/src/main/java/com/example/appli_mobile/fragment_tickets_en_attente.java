@@ -76,6 +76,7 @@ public class fragment_tickets_en_attente extends Fragment {
                 fragment_tickets_en_attente newFragment = new fragment_tickets_en_attente();
                 Bundle newBundle = new Bundle();
                 newBundle.putString("username", username);
+                newBundle.putString("token", token);
                 newFragment.setArguments(newBundle);
 
                 // Remplacer le fragment actuel par la nouvelle instance
